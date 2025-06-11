@@ -14,7 +14,7 @@ In this repository I will document my practical exercises, projects and scripts 
 ## Areas
 | Topic | Description |
 |-------|-------------|
-| [SOC-Analys](./SOC-Analyst/) | Analyzing logs, Incident detection, siem, SOC-Lab |
+| [SOC-Analyst](./SOC-Analyst/) | Analyzing logs, Incident detection, siem, SOC-Lab |
 | [Offensive Security](./Offensive%20Security/) | CTFs, TryHackMe, Exploits |
 | [Cloud](./Cloud/) | AWS, Concepts, IAM, General, Security |
 | [Scripting/Automation](./Scripting%20&%20Automation/) | Python automation |
