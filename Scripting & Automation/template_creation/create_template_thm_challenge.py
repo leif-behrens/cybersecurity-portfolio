@@ -47,8 +47,7 @@ def process_values(template: str, values: dict) -> str:
         elif placeholder == "!tasks!":
             task_block: str = ""
             for task in value:
-                task_block += f"### {task.strip()}\n#### Approach\n\n"
-                #template = template.replace(placeholder, f"### {task}\n#### Approach\n\n!tasks!")
+                task_block += f"### {task.strip()}\n####Question\n\n#### Approach\n\n####Answer\n\n"
             template = template.replace(placeholder, task_block)
             
         else:
