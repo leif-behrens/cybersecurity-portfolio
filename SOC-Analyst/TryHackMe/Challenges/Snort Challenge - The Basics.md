@@ -24,7 +24,7 @@ This challenge deals with the creation of Snort rules in different chapters.
 #### Approach
 I created the following rule:
 
-![alt alert tcp any any <> any 80 (msg: "HTTP traffic detected"; sid:1000001;rev:1)](screenshots/1_writing_ids_rules_(http)_screenshot_1.png)
+```alert tcp any any <> any 80 (msg: "HTTP traffic detected"; sid:1000001; rev:1;)```
 
 Then I executed following command:
 
@@ -117,9 +117,136 @@ In the last question, a log file was created, which is read in with snort as fol
 ---
 
 ### Writing IDS Rules (FTP)
-#### Approach
+#### Question
+> Navigate to the task folder. Use the given pcap file.<br>
+> Write a **single** rule to detect **all TCP port 21**  traffic in the given pcap.<br>
+> *What is the number of detected packets?*
 
-### Writing IDS Rules(PNG)
+#### Approach
+I created the following rule:
+
+```alert tcp any any <> any 21 (msg: "FTP traffic detected"; sid:1000001; rev:1;)```
+
+Then I executed the following command:
+
+```snort -r mx-3.pcap -c local.rules -A full -l .```
+
+![Rule FTP](screenshots\2_writing_ids_rules_(ftp)_screenshot_1.png)
+
+#### Answer
+> 307
+---
+
+#### Question
+> Investigate the log file.<br>
+> *What is the FTP service name?*
+
+#### Approach
+At first I tried reading the generated log from the previous question and ```grep``` the Keyword *ftp* like this:
+
+```snort -r snort.log.1748544782 | grep - i "ftp"```
+
+I didn't receive any useful output. That's why I tried to use ```strings``` and ```grep``` to analyze the logfile for the *ftp* keyword:
+
+```strings snort.log.1748544782 | grep -i "ftp"```
+
+Then I received the following output:
+
+![Result](screenshots\2_writing_ids_rules_(ftp)_screenshot_2.png)
+
+#### Answer
+> Microsoft FTP Service
+---
+
+#### Question
+> **Clear the previous log and alarm files.** <br>
+Deactivate/comment on the old rules.<br>
+Write a rule to detect failed FTP login attempts in the given pcap.<br>
+> *What is the number of detected packets?*
+
+#### Approach
+You can write snort rules that detects content within the packets. Since ftp traffic is not encrypted it is easy to read the communication between server and client. I researched for the ftp response code for a failed login attempt, which is ```530```.
+
+So the new snort rule I created looks like this:
+```alert tcp any any <> any 21 (msg: "FTP login attempt failed"; content: "530"; sid:1000001; rev:1;)```
+
+Then I used the newly created rule on the given pcap file:
+
+```snort -r ftp-png-gif.pcap -c local.rules -A full -l .```
+
+Then I received the following output:
+
+![Result](screenshots\2_writing_ids_rules_(ftp)_screenshot_3.png)
+
+#### Answer
+> 41
+---
+
+#### Question
+> **Clear the previous log and alarm files.**<br>
+> Deactivate/comment on the old rule.<br>
+> Write a rule to detect successful FTP logins in the given pcap.<br>
+> *What is the number of detected packets?*
+
+#### Approach
+Similar to the previous task I researched for the ftp response code of a successful login attempt, which is ```230```.
+
+So the new snort rule I created looks like this:
+```alert tcp any any <> any 21 (msg: "FTP login successful"; content: "230"; sid:1000001; rev:1;)```
+
+Then I used the newly created rule on the given pcap file:
+
+```snort -r ftp-png-gif.pcap -c local.rules -A full -l .```
+
+![Result](screenshots\2_writing_ids_rules_(ftp)_screenshot_4.png)
+
+#### Answer
+> 1
+---
+
+#### Question
+> **Clear the previous log and alarm files.**<br>
+> Deactivate/comment on the old rule.<br>
+> Write a rule to detect FTP login attempts with a valid username but no password entered yet.<br>
+> *What is the number of detected packets?*
+
+#### Approach
+The ftp response code for the given scenario is ```331```.
+
+```alert tcp any any <> any 21 (msg: "FTP valid username, no password"; content: "331"; sid:1000001; rev:1;)```
+
+Then I used the newly created rule on the given pcap file:
+
+```snort -r ftp-png-gif.pcap -c local.rules -A full -l .```
+
+![Result](screenshots\2_writing_ids_rules_(ftp)_screenshot_5.png)
+
+#### Answer
+> 42
+---
+
+#### Question
+> **Clear the previous log and alarm files.**<br>
+> Deactivate/comment on the old rule.<br>
+> Write a rule to detect FTP login attempts with the "Administrator" username but no password entered yet.<br>
+> *What is the number of detected packets?*
+
+#### Approach
+Like before I just added the additional content keyword **Administrator**.
+
+```alert tcp any any <> any 21 (msg: "FTP valid username, no password"; content: "Administrator"; content: "331"; sid:1000001; rev:1;)```
+
+Then I used the newly created rule on the given pcap file:
+
+```snort -r ftp-png-gif.pcap -c local.rules -A full -l .```
+
+![Result](screenshots\2_writing_ids_rules_(ftp)_screenshot_6.png)
+
+#### Answer
+> 7
+---
+
+### Writing IDS Rules (PNG)
 #### Approach
 
 ### Writing IDS Rules (Torrent Metafile)
